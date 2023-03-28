@@ -10,7 +10,6 @@ import com.droame.entities.Customer;
 public interface CustomerRepository extends CrudRepository <Customer , Integer>{
     
 	Customer findById(int id);
-	
 	@Query("select c from Customer c")
 	List <Customer> getAllCustomer(); 
 	

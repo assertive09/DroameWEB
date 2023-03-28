@@ -1,6 +1,7 @@
 package com.droame.controller;
 
 import java.net.http.HttpRequest;
+import java.security.Principal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +16,12 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import com.droame.entities.Booking;
 import com.droame.entities.Customer;
+import com.droame.entities.Drone;
+import com.droame.entities.Location;
 import com.droame.repository.BookingRepository;
 import com.droame.repository.CustomerRepository;
+import com.droame.repository.DroneRepository;
+import com.droame.repository.LocationRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -28,6 +33,13 @@ public class MainController {
 
 	@Autowired
 	private BookingRepository br;
+
+	@Autowired
+	private LocationRepository lr;
+
+	@Autowired
+	private DroneRepository dr;
+
 	@RequestMapping("/home")
 	public String home(Model m) {
 
@@ -48,21 +60,39 @@ public class MainController {
 	}
 
 	// add booking handlers
-	@RequestMapping( "/booking_form/{id}")
-	public String addBooking(@PathVariable("id")  int id)
-	{
-		Customer c=cr.findById(id);
-	
+	@RequestMapping("/booking_form/{id}")
+	public String bookingForm(@PathVariable("id") int id, Model m, HttpServletRequest request) {
+		List<Location> locations = lr.getAllLocations();
+		m.addAttribute("locations", locations);
+		List<Drone> drones = dr.getAllDrones();
+		m.addAttribute("drones", drones);
+		m.addAttribute("id", id);
+		return "add_booking";
+
 	}
-	
-	public Stirng saveBookings() {
-		Booking booking = new Booking(HttpServletRequest request);
-		booking.setCustomer(c);
-		br.save(booking);
-		return "redirect:"+request.getContextPath()+"/home";
+
+	@RequestMapping(path = "/add_booking", method = RequestMethod.POST)
+	public RedirectView saveBookings(HttpServletRequest request, @RequestParam("lId") int lId,
+			@RequestParam("dId") int dId, @RequestParam("cId") int cId) {
+		
+		// Fetching data
+		Customer customer = cr.findById(Integer.parseInt(request.getParameter("cId")));
+		Drone drone = dr.findById(dId);
+		Location location = lr.findById(lId);
+		System.out.println(customer);
+		System.out.println(drone);
+		System.out.println(location);
+		Booking booking = new Booking();
+		booking.setCustomer(customer);
+		booking.setDrones(drone);
+		booking.setLocation(location);
+		customer.setBookings(booking);
+		cr.save(customer);
+		RedirectView rv = new RedirectView();
+		rv.setUrl(request.getContextPath() + "/home");
+		return rv;
 	}
-	
-	
+
 	public CustomerRepository getCr() {
 		return cr;
 	}

@@ -4,14 +4,12 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-
-import com.droame.entities.Booking;
 import com.droame.entities.Location;
 
-public interface BookingRepository extends CrudRepository<Booking,Integer> {
+public interface LocationRepository extends CrudRepository<Location, Integer>{
 
-	Booking findById(int id);
+	Location findById(int id);
 	@Query("select l from Location l")
-	List <Location> getAllLocation(); 
+	List <Location> getAllLocations(); 
 	
 }
