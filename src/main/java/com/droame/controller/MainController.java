@@ -86,6 +86,8 @@ public class MainController {
 		booking.setCustomer(customer);
 		booking.setDrones(drone);
 		booking.setLocation(location);
+		drone.setBooking(booking);
+		location.setBooking(booking);
 		customer.setBookings(booking);
 		cr.save(customer);
 		RedirectView rv = new RedirectView();
